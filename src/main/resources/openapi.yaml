@@ -1,0 +1,227 @@
+openapi: 3.0.3
+info:
+  title: Bookstore imitation
+  version: 1.0.0
+paths:
+  /books:
+    post:
+      description: Create a book
+      operationId: CreateBook
+      tags: [Books]
+      requestBody:
+        description: New Book to add
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBookRequest"
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        400:
+          description: Invalid input
+        500:
+          description: Internal server error
+    get:
+      description: Get list of all books
+      operationId: GetBooks
+      tags: [Books]
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Books"
+        400:
+          description: Invalid input
+        500:
+          description: Internal server error
+  /books/{bookUuid}:
+    get:
+      description: Get book
+      operationId: GetBook
+      tags: [Books]
+      parameters:
+        - $ref: "#/components/parameters/BookUuid"
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        400:
+          description: Invalid input
+        500:
+          description: Internal server error
+    put:
+      description: Update book stock
+      operationId: UpdateBook
+      tags: [Books]
+      parameters:
+        - $ref: "#/components/parameters/BookUuid"
+      requestBody:
+        description: New stock value
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockUpdateRequest"
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        400:
+          description: Invalid input
+        500:
+          description: Internal server error
+    delete:
+      description: Delete
+      operationId: DeleteBook
+      tags: [Books]
+      parameters:
+        - $ref: "#/components/parameters/BookUuid"
+      responses:
+        204:
+          description: Resource deleted successfully
+        400:
+          description: Invalid input
+        500:
+          description: Internal server error
+  /books/{bookUuid}/sell:
+    post:
+      description: Sell book's copies
+      operationId: SellBooks
+      tags: [Books]
+      parameters:
+        - $ref: "#/components/parameters/BookUuid"
+      requestBody:
+        description: Book quantity to sell
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SellBookRequest"
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        400:
+          description: Invalid input
+        500:
+          description: Internal server error
+  /statistics:
+    get:
+      description: Get number of books for given author or/and book name
+      operationId: GetStatistics
+      tags: [Statistics]
+      parameters:
+        - $ref: "#/components/parameters/AuthorName"
+        - $ref: "#/components/parameters/BookName"
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: number
+                format: int64
+        400:
+          description: Invalid input
+        500:
+          description: Internal server error
+  /statistics/file:
+    get:
+      description: Get all books for given author in file
+      operationId: GetFileStatistics
+      tags: [Statistics]
+      parameters:
+        - $ref: "#/components/parameters/AuthorName"
+      responses:
+        200:
+          description: Successful response
+        400:
+          description: Invalid input
+        500:
+          description: Internal server error
+components:
+  parameters:
+    BookUuid:
+      name: bookUuid
+      in: path
+      description: Book UUID
+      required: true
+      schema:
+        type: string
+        format: uuid
+    AuthorName:
+      name: authorName
+      in: query
+      description: Namelike search for author
+      schema:
+        type: string
+    BookName:
+      name: bookName
+      in: query
+      description: Namelike search for book name
+      schema:
+        type: string
+  schemas:
+    CreateBookRequest:
+      type: object
+      required:
+        - name
+        - author
+        - publisher
+        - code
+        - quantity
+      properties:
+        name:
+          type: string
+        author:
+          type: string
+        publisher:
+          type: string
+        code:
+          type: string
+        quantity:
+          type: number
+          format: int64
+    Book:
+      allOf:
+        - $ref: '#/components/schemas/CreateBookRequest'
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          format: uuid
+    Books:
+      type: array
+      items:
+        $ref: "#/components/schemas/Book"
+    StockUpdateRequest:
+      type: object
+      required:
+        - stock
+      properties:
+        stock:
+          type: number
+          format: int64
+    SellBookRequest:
+      type: object
+      required:
+        - quantity
+      properties:
+        quantity:
+          type: number
+          format: int64
