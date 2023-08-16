@@ -23,7 +23,6 @@ public class BookController implements BooksApi {
     private BookService bookService;
     private ModelMapper modelMapper;
 
-    @Autowired
     public BookController(BookService bookService, ModelMapper modelMapper) {
         this.bookService = bookService;
         this.modelMapper = modelMapper;
